@@ -3,9 +3,9 @@ lines = File.read("./input.txt").lines
 def priority(item)
   case item
   when "a".."z"
-    item.ord - 96
+    item.ord - "a".ord + 1
   when "A".."Z"
-    item.ord - 38
+    item.ord - "A".ord + 27
   end
 end
 

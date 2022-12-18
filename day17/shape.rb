@@ -16,7 +16,7 @@ class Shape
   end
 
   def to_s
-    rows.reverse.map { |r| r.map { |c| c ? '#' : ' ' }.join("") }.join("\n")
+    rows.map { |r| r.map { |c| c ? '#' : ' ' }.join("") }.join("\n")
   end
 
   def blocks

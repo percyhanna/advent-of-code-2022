@@ -33,26 +33,16 @@ shapes = [
   SQUARE
 ].map { |shape| Shape.new(shape) }
 
-jets = File.read("./jets-test.txt").chomp.chars
-cave = Cave.new(shapes: shapes, jets: jets, rocks: 10_000)
+# jets = File.read("./jets-test.txt").chomp.chars
+# cave = Cave.new(shapes: shapes, jets: jets, rocks: 2022)
 # cave = Cave.new(shapes: shapes, jets: jets, rocks: 1_000_000_000_000)
 
-# jets = File.read("./jets.txt").chomp.chars
-# cave = Cave.new(shapes: shapes, jets: jets, rocks: 2022)
+jets = File.read("./jets.txt").chomp.chars
+cave = Cave.new(shapes: shapes, jets: jets, rocks: 2022)
+cave = Cave.new(shapes: shapes, jets: jets, rocks: 1_000_000_000_000)
 
-# cave.run
-
-result = RubyProf.profile do
-  cave.run
+begin
+  cave.run_with_optimizations(batch_size: 3_000)
 end
-
-printer = RubyProf::FlatPrinter.new(result)
-printer.print(STDOUT)
-
-# printer = RubyProf::GraphPrinter.new(result)
-# printer.print(STDOUT, {})
-
-
-# puts shapes.inspect
 
 puts cave.height

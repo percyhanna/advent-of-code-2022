@@ -5,7 +5,8 @@ class Cave
   attr_reader :rows, :shapes, :jets, :width, :rocks
 
   def initialize(shapes:, jets:, rocks:, width: 7)
-    @rows = Hash.new { |hash, key| hash[key] = Row.new(width) }
+    @height = 0
+    @rows = Hash.new { |hash, key| @height = [@height, key + 1].max; hash[key] = Array.new(width, false) }
     @shapes = shapes
     @jets = jets.map { |c| c == ">" }
     @rocks = rocks
@@ -36,7 +37,7 @@ class Cave
   end
 
   def height
-    rows.count
+    @height
   end
 
   def to_s

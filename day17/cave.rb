@@ -18,7 +18,7 @@ class Cave
   end
 
   def run
-    log_multiple = 1_000
+    log_multiple = 100_000
     last_cycle = Time.now.to_f
 
     rocks.times do |i|

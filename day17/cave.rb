@@ -33,6 +33,89 @@ class Cave
     end
   end
 
+  def run_with_optimizations
+    log_multiple = 100_000
+    last_cycle = Time.now.to_f
+
+    batch_size = 500
+    remaining_rocks = rocks - initial_batch
+
+    raise "Not enough rocks" if remaining_rocks < 0
+
+    initial_batch.times do
+      throw_rock
+    end
+
+    # Inspect the generated lines, ignoring 20 lines on each end (for it to normalize)
+    sampled_lines = to_s.lines[20..-20]
+
+    # Start with a 10 line sample
+    search_lines = sampled_lines[0..20]
+    next_offset = sampled_lines.count.times.find do |offset|
+      next if offset.zero?
+
+      search_lines.each_with_index.all? { |line, index| sampled_lines[index + offset] == line }
+    end
+
+    raise "No pattern found" unless next_offset
+
+    puts "Found repetition offset at #{next_offset.inspect}"
+
+    # Start off with a known reptition of the sample
+    puts "Before starting: #{remaining_rocks}"
+    next_offset.times.find do |i|
+      if matches_sample?(search_lines)
+        puts "Found the repetition!"
+        next true
+      end
+
+      throw_rock
+      remaining_rocks -= 1
+
+      false
+    end
+    puts "After starting: #{remaining_rocks}"
+
+    # Find out how many rocks create the pattern
+    rock_count = next_offset.times.find do |i|
+      throw_rock
+      remaining_rocks -= 1
+
+      matches_sample?(search_lines)
+    end
+
+    raise "Could not find rock count per repetition" unless rock_count
+
+    puts "Rock count per repetition is #{rock_count}"
+
+    # Process remaining rocks
+    repeated_count = remaining_rocks / next_offset - 1
+
+    puts "Pattern is repeated another #{repeated_count} times"
+
+    # Now fake the repetition
+
+
+    # rocks.times do |i|
+    #   throw_rock
+
+    #   if i % log_multiple == 0
+    #     log("#{i / log_multiple}:\t#{Time.now.to_f}\t#{(Time.now.to_f - last_cycle) / log_multiple}\t#{height}")
+    #     last_cycle = Time.now.to_f
+    #   end
+
+    #   # log to_s
+    # end
+  end
+
+  def matches_sample?(sampled_lines, offset: 5)
+    puts sampled_lines.inspect
+    puts to_s.lines[offset...(sampled_lines.count + offset)].inspect
+    puts
+
+    sampled_lines == to_s.lines[offset...(sampled_lines.count + offset)]
+  end
+
   def height
     @height
   end

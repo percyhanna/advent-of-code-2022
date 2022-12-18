@@ -1,3 +1,4 @@
+require "./cycler"
 require "./row"
 
 class Cave

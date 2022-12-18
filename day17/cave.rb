@@ -41,7 +41,7 @@ class Cave
   end
 
   def to_s
-    rows.map { |k, row| "#{k}:\t#{row}" }.reverse.join("\n")
+    rows.map { |k, row| "|#{row.map { |b| b ? '#' : ' ' }.join("")}|" }.reverse.join("\n")
   end
 
   private

@@ -83,9 +83,9 @@ class Cave
 
   def can_move_to?(shape, x, y)
     # Dimensions check
-    return false if x + shape.width > width
     return false if x < 0
     return false if y < 0
+    return false if x + shape.width > width
 
     # Always possible if it's beyond the height of the cave
     return true if y > height
@@ -97,6 +97,7 @@ class Cave
   end
 
   def has_block?(x, y)
+    return false if y > @height
     return false unless rows.key?(y)
     rows[y][x]
   end

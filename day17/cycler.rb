@@ -1,22 +1,19 @@
 class Cycler
+  attr_reader :count, :counter
+
   def initialize(items)
     @items = items
     @count = @items.count
-    @offset = 0
+    @counter = 0
   end
 
   def next
-    item = @items[@offset]
-    if @offset + 1 >= @count
-      @offset = 0
-    else
-      @offset += 1
-    end
-
+    item = @items[@counter % @count]
+    @counter += 1
     item
   end
 
   def skip(count)
-    @offset = (@offset + count) % @count
+    @counter += count
   end
 end

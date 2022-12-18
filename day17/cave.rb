@@ -33,11 +33,10 @@ class Cave
     end
   end
 
-  def run_with_optimizations
+  def run_with_optimizations(batch_size: 500, buffer: 20, sample_size: 20, fake_line_count: 50)
     log_multiple = 100_000
     last_cycle = Time.now.to_f
 
-    batch_size = 500
     remaining_rocks = rocks - batch_size
 
     raise "Not enough rocks" if remaining_rocks < 0
@@ -48,10 +47,7 @@ class Cave
 
     # Inspect the generated lines, ignoring 20 lines on each end (for it to normalize)
     initial_cave = to_s
-    sampled_lines = initial_cave.lines[20..-20]
-
-    # Start with a 20 line sample
-    search_lines = sampled_lines[0..20].join
+    search_lines = initial_cave.lines[buffer..(buffer + sample_size)].join
     initial_count = initial_cave.scan(search_lines).count
 
 
@@ -66,6 +62,7 @@ class Cave
     # Now find out how many rocks per reptition
     rocks_per_reptition = 0
     initial_height = @height
+    initial_jets_counter = jets_cycle.counter
     initial_count += 1
     loop do
       throw_rock
@@ -75,28 +72,29 @@ class Cave
       break if to_s.scan(search_lines).count > initial_count
 
       raise "Ran out of rocks" if remaining_rocks < 0
-      raise "Too many rocks" if rocks_per_reptition > 100
+      raise "Too many rocks" if rocks_per_reptition > batch_size
     end
 
-    lines_per_reptition = @height - initial_height
+    lines_per_repitition = @height - initial_height
+    jets_per_repitition = jets_cycle.counter - initial_jets_counter
 
     puts "Rocks per repetition: #{rocks_per_reptition}"
-    puts "Lines per repetition: #{lines_per_reptition}"
+    puts "Lines per repetition: #{lines_per_repitition}"
 
     repitition_count = remaining_rocks / rocks_per_reptition
 
     # Grab some fake lines!
-    fake_lines = 10.times.map do |line|
+    fake_lines = fake_line_count.times.map do |line|
       @rows[@height - line - 1]
     end
 
 
     # Skip ahead!
-    @height += repitition_count * lines_per_reptition
+    @height += repitition_count * lines_per_repitition
     remaining_rocks -= repitition_count * rocks_per_reptition
 
     # Need to skip ahead on the cyclers, too
-    jets_cycle.skip(repitition_count * rocks_per_reptition)
+    jets_cycle.skip(repitition_count * jets_per_repitition)
     shapes_cycle.skip(repitition_count * rocks_per_reptition)
 
     puts "Skipped ahead:    #{repitition_count}"
@@ -104,7 +102,7 @@ class Cave
     puts "Remaining rocks:  #{remaining_rocks}"
 
     # Add some fake lines
-    10.times do |line|
+    fake_line_count.times do |line|
       @rows[@height - line] = fake_lines[line]
     end
 

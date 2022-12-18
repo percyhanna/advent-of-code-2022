@@ -22,10 +22,7 @@ class Cave
     last_cycle = Time.now.to_f
 
     rocks.times do |i|
-      shape = shapes_cycle.next
-
-      x, y = move_shape(shape)
-      place_shape(shape, x, y)
+      throw_rock
 
       if i % log_multiple == 0
         log("#{i / log_multiple}:\t#{Time.now.to_f}\t#{(Time.now.to_f - last_cycle) / log_multiple}")
@@ -45,6 +42,13 @@ class Cave
   end
 
   private
+
+  def throw_rock
+    shape = shapes_cycle.next
+
+    x, y = move_shape(shape)
+    place_shape(shape, x, y)
+  end
 
   def move_shape(shape, x: 2, y: height + 3)
     loop do

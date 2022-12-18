@@ -38,74 +38,79 @@ class Cave
     last_cycle = Time.now.to_f
 
     batch_size = 500
-    remaining_rocks = rocks - initial_batch
+    remaining_rocks = rocks - batch_size
 
     raise "Not enough rocks" if remaining_rocks < 0
 
-    initial_batch.times do
+    batch_size.times do
       throw_rock
     end
 
     # Inspect the generated lines, ignoring 20 lines on each end (for it to normalize)
-    sampled_lines = to_s.lines[20..-20]
+    initial_cave = to_s
+    sampled_lines = initial_cave.lines[20..-20]
 
-    # Start with a 10 line sample
-    search_lines = sampled_lines[0..20]
-    next_offset = sampled_lines.count.times.find do |offset|
-      next if offset.zero?
+    # Start with a 20 line sample
+    search_lines = sampled_lines[0..20].join
+    initial_count = initial_cave.scan(search_lines).count
 
-      search_lines.each_with_index.all? { |line, index| sampled_lines[index + offset] == line }
-    end
 
-    raise "No pattern found" unless next_offset
-
-    puts "Found repetition offset at #{next_offset.inspect}"
-
-    # Start off with a known reptition of the sample
-    puts "Before starting: #{remaining_rocks}"
-    next_offset.times.find do |i|
-      if matches_sample?(search_lines)
-        puts "Found the repetition!"
-        next true
-      end
-
+    # Loop until we get one more repitition
+    loop do
       throw_rock
       remaining_rocks -= 1
 
-      false
+      break if to_s.scan(search_lines).count > initial_count
     end
-    puts "After starting: #{remaining_rocks}"
 
-    # Find out how many rocks create the pattern
-    rock_count = next_offset.times.find do |i|
+    # Now find out how many rocks per reptition
+    rocks_per_reptition = 0
+    initial_height = @height
+    initial_count += 1
+    loop do
       throw_rock
       remaining_rocks -= 1
+      rocks_per_reptition += 1
 
-      matches_sample?(search_lines)
+      break if to_s.scan(search_lines).count > initial_count
+
+      raise "Ran out of rocks" if remaining_rocks < 0
+      raise "Too many rocks" if rocks_per_reptition > 100
     end
 
-    raise "Could not find rock count per repetition" unless rock_count
+    lines_per_reptition = @height - initial_height
 
-    puts "Rock count per repetition is #{rock_count}"
+    puts "Rocks per repetition: #{rocks_per_reptition}"
+    puts "Lines per repetition: #{lines_per_reptition}"
 
-    # Process remaining rocks
-    repeated_count = remaining_rocks / next_offset - 1
+    repitition_count = remaining_rocks / rocks_per_reptition
 
-    puts "Pattern is repeated another #{repeated_count} times"
+    # Grab some fake lines!
+    fake_lines = 10.times.map do |line|
+      @rows[@height - line - 1]
+    end
 
-    # Now fake the repetition
 
+    # Skip ahead!
+    @height += repitition_count * lines_per_reptition
+    remaining_rocks -= repitition_count * rocks_per_reptition
 
-    # rocks.times do |i|
-    #   throw_rock
+    # Need to skip ahead on the cyclers, too
+    jets_cycle.skip(repitition_count * rocks_per_reptition)
+    shapes_cycle.skip(repitition_count * rocks_per_reptition)
 
-    #   if i % log_multiple == 0
-    #     log("#{i / log_multiple}:\t#{Time.now.to_f}\t#{(Time.now.to_f - last_cycle) / log_multiple}\t#{height}")
-    #     last_cycle = Time.now.to_f
-    #   end
+    puts "Skipped ahead:    #{repitition_count}"
+    puts "New height:       #{@height}"
+    puts "Remaining rocks:  #{remaining_rocks}"
 
-    #   # log to_s
-    # end
+    # Add some fake lines
+    10.times do |line|
+      @rows[@height - line] = fake_lines[line]
+    end
+
+    remaining_rocks.times do |i|
+      throw_rock
+    end
   end
 
   def matches_sample?(sampled_lines, offset: 5)

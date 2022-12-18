@@ -15,4 +15,8 @@ class Cycler
 
     item
   end
+
+  def skip(count)
+    @offset = (@offset + count) % @count
+  end
 end

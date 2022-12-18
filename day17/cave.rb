@@ -101,10 +101,10 @@ class Cave
   end
 
   def shapes_cycle
-    @shapes_cycle ||= shapes.cycle
+    @shapes_cycle ||= Cycler.new(shapes)
   end
 
   def jets_cycle
-    @jets_cycle ||= jets.cycle
+    @jets_cycle ||= Cycler.new(jets)
   end
 end

@@ -21,10 +21,12 @@ class Cube
     [@x, @y, @z]
   end
 
+  def neighbours
+    EDGE_COORDS.map { |(x, y, z)| [@x + x, @y + y, @z + z] }
+  end
+
   def exposed_sides(space)
-    EDGE_COORDS.reject do |(x, y, z)|
-      space.key?([@x + x, @y + y, @z + z])
-    end.count
+    neighbours.reject { |coord| space.key?(coord) }.count
   end
 
   def to_s

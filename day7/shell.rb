@@ -1,6 +1,9 @@
 commands = File.read("./test-input.txt").lines.map(&:chomp)
 commands = File.read("./input.txt").lines.map(&:chomp)
 
+TOTAL_SPACE = 70_000_000
+SPACE_NEEDED = 30_000_000
+
 dirs = Hash.new { |hash, key| hash[key] = 0 }
 cwd = "/"
 commands.each do |command|
@@ -35,3 +38,14 @@ dirs.keys.each do |parent|
 end
 
 puts(dir_totals.values.select { |size| size < 100_000 }.sum)
+
+space_available = TOTAL_SPACE - dir_totals["/"]
+size_to_delete = SPACE_NEEDED - space_available
+
+puts "TOTAL_SPACE: #{TOTAL_SPACE}"
+puts "SPACE_NEEDED: #{SPACE_NEEDED}"
+puts "space_available: #{space_available}"
+puts "all files: #{dir_totals["/"]}"
+puts "size_to_delete: #{size_to_delete}"
+
+puts(dir_totals.select { |dir, size| size > size_to_delete }.sort_by { |dir, size| size }.first)

@@ -25,9 +25,7 @@ File.read("./input.txt").lines.map(&:chomp).each do |line|
     from = match.named_captures["from"].to_i - 1
     to = match.named_captures["to"].to_i - 1
 
-    qty.times do
-      stacks[to].unshift(stacks[from].shift)
-    end
+    stacks[to].unshift(*stacks[from].shift(qty))
   end
 end
 

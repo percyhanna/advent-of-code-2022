@@ -11,11 +11,7 @@ covered_lines = lines.select do |line|
 
   shared = first.to_a & second.to_a
 
-  if first.cover?(second) || second.cover?(first)
-    true
-  else
-    false
-  end
+  shared.any?
 end
 
 puts covered_lines.count

@@ -1,18 +1,20 @@
-lines = File.read("./test-input.txt").lines.map(&:chomp).map(&:to_i)
-lines = File.read("./input.txt").lines.map(&:chomp).map(&:to_i)
+lines = File.read("./test-input.txt").lines.map(&:chomp).map { |num| num.to_i * 811589153 }
+lines = File.read("./input.txt").lines.map(&:chomp).map { |num| num.to_i * 811589153 }
 
 ordered_lines = lines.each_with_index.map { |num, i| [num, i] }
 orig_lines = ordered_lines.dup
 
-orig_lines.each do |tuple|
-  number, order = tuple
-  next if number == 0
+10.times do
+  orig_lines.each do |tuple|
+    number, order = tuple
+    next if number == 0
 
-  index = ordered_lines.index { |(num, ord)| ord == order }
-  ordered_lines.delete_at(index)
+    index = ordered_lines.index { |(num, ord)| ord == order }
+    ordered_lines.delete_at(index)
 
-  new_index = (index + number) % ordered_lines.count
-  ordered_lines.insert(new_index, tuple)
+    new_index = (index + number) % ordered_lines.count
+    ordered_lines.insert(new_index, tuple)
+  end
 end
 
 offset_0 = ordered_lines.index { |(num, ord)| num == 0 }
